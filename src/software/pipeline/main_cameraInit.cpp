@@ -168,7 +168,7 @@ int aliceVision_main(int argc, char **argv)
   bool errorOnMissingColorProfile = true;
   image::ERawColorInterpretation rawColorInterpretation = image::ERawColorInterpretation::LibRawNoWhiteBalancing;
   bool enableLensCorrectionProfileSearch = false;
-  bool lensCorrectionProfileSearchByLensNameAndCameraMakerOnly = false;
+  bool lensCorrectionProfileSearchIgnoreCameraModel = false;
 
 
   po::options_description requiredParams("Required parameters");
@@ -190,7 +190,7 @@ int aliceVision_main(int argc, char **argv)
       "Lens Correction Profile filepath or database directory path.")
     ("enableLensCorrectionProfileSearch", po::value<bool>(&enableLensCorrectionProfileSearch)->default_value(enableLensCorrectionProfileSearch),
       "Enable automatic search of Lens Correction Profile in the selected database")
-    ("lensCorrectionProfileSearchByLensNameAndCameraMakerOnly", po::value<bool>(&lensCorrectionProfileSearchByLensNameAndCameraMakerOnly)->default_value(lensCorrectionProfileSearchByLensNameAndCameraMakerOnly),
+    ("lensCorrectionProfileSearchIgnoreCameraModel", po::value<bool>(&lensCorrectionProfileSearchIgnoreCameraModel)->default_value(lensCorrectionProfileSearchIgnoreCameraModel),
       "Automatic LCP Search considers only the camera maker and the lens name")
     ("defaultFocalLength", po::value<double>(&defaultFocalLength)->default_value(defaultFocalLength),
       "Focal length in mm. (or '-1' to unset)")
@@ -407,7 +407,7 @@ int aliceVision_main(int argc, char **argv)
   image::DCPDatabase dcpDatabase(colorProfileDatabaseDirPath);
   int viewsWithDCPMetadata = 0;
 
-  LCPdatabase lcpStore(lensCorrectionProfileInfo, lensCorrectionProfileSearchByLensNameAndCameraMakerOnly);
+  LCPdatabase lcpStore(lensCorrectionProfileInfo, lensCorrectionProfileSearchIgnoreCameraModel);
 
   #pragma omp parallel for
   for (int i = 0; i < sfmData.getViews().size(); ++i)
