@@ -167,7 +167,7 @@ int aliceVision_main(int argc, char **argv)
   bool allowSingleView = false;
   bool errorOnMissingColorProfile = true;
   image::ERawColorInterpretation rawColorInterpretation = image::ERawColorInterpretation::LibRawNoWhiteBalancing;
-  bool enableLensCorrectionProfileSearch = false;
+  bool enableLensCorrectionProfileSearch = true;
   bool lensCorrectionProfileSearchIgnoreCameraModel = false;
 
 
@@ -337,6 +337,8 @@ int aliceVision_main(int argc, char **argv)
       v_lcpFilepath.push_back(lensCorrectionProfileInfo);
   }
 
+  ALICEVISION_LOG_INFO("LCP database contains " << v_lcpFilepath.size() << " profiles.");
+
   camera::EINTRINSIC allowedCameraModels = camera::EINTRINSIC_parseStringToBitmask(allowedCameraModelsStr);
 
   // use current time as seed for random generator for intrinsic Id without metadata
@@ -408,6 +410,8 @@ int aliceVision_main(int argc, char **argv)
   int viewsWithDCPMetadata = 0;
 
   LCPdatabase lcpStore(lensCorrectionProfileInfo, lensCorrectionProfileSearchIgnoreCameraModel);
+
+  ALICEVISION_LOG_INFO("LCP database contains " << lcpStore.size() << " profiles.");
 
   #pragma omp parallel for
   for (int i = 0; i < sfmData.getViews().size(); ++i)
@@ -666,21 +670,45 @@ int aliceVision_main(int argc, char **argv)
         if (intrinsicDisto)
         {
           std::shared_ptr<camera::Distortion> distortion = intrinsicDisto->getDistortion();
-          std::shared_ptr<camera::DistortionRadialK3> distoRadialK3 = std::dynamic_pointer_cast<camera::DistortionRadialK3>(distortion);
-          if (distoRadialK3)
+
+          if (!lensParam.isFisheye())
           {
-            const int Dmax = std::max<int>(lcpData->getImageWidth(), lcpData->getImageLength());
+              std::shared_ptr<camera::DistortionRadialK3> distoRadialK3 = std::dynamic_pointer_cast<camera::DistortionRadialK3>(distortion);
+              if (distoRadialK3)
+              {
+                  const int Dmax = std::max<int>(lcpData->getImageWidth(), lcpData->getImageLength());
 
-            const aliceVision::Vec2 offset((lensParam.perspParams.ImageXCenter - 0.5f) * Dmax, (lensParam.perspParams.ImageYCenter - 0.5f) * Dmax);        
-            intrinsicDisto->setOffset(offset);
+                  const aliceVision::Vec2 offset((lensParam.perspParams.ImageXCenter - 0.5f) * Dmax, (lensParam.perspParams.ImageYCenter - 0.5f) * Dmax);
+                  intrinsicDisto->setOffset(offset);
 
-            std::vector<double> p;
-            p.push_back(lensParam.perspParams.RadialDistortParam1);
-            p.push_back(lensParam.perspParams.RadialDistortParam2);
-            p.push_back(lensParam.perspParams.RadialDistortParam3);
-            intrinsicDisto->setDistortionParams(p);
+                  std::vector<double> p;
+                  p.push_back(lensParam.perspParams.RadialDistortParam1);
+                  p.push_back(lensParam.perspParams.RadialDistortParam2);
+                  p.push_back(lensParam.perspParams.RadialDistortParam3);
+                  intrinsicDisto->setDistortionParams(p);
 
-            ++lcpGeometryViewCount;
+                  ++lcpGeometryViewCount;
+              }
+          }
+          else
+          {
+              std::shared_ptr<camera::DistortionFisheye> DistortionFisheye = std::dynamic_pointer_cast<camera::DistortionFisheye>(distortion);
+              if (DistortionFisheye)
+              {
+                  const int Dmax = std::max<int>(lcpData->getImageWidth(), lcpData->getImageLength());
+
+                  const aliceVision::Vec2 offset((lensParam.perspParams.ImageXCenter - 0.5f) * Dmax, (lensParam.perspParams.ImageYCenter - 0.5f) * Dmax);
+                  intrinsicDisto->setOffset(offset);
+
+                  std::vector<double> p;
+                  p.push_back(lensParam.fisheyeParams.RadialDistortParam1);
+                  p.push_back(lensParam.fisheyeParams.RadialDistortParam2);
+                  p.push_back(0.0);
+                  p.push_back(0.0);
+                  intrinsicDisto->setDistortionParams(p);
+
+                  ++lcpGeometryViewCount;
+              }
           }
         }
 
