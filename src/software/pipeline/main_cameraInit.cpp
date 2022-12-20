@@ -716,6 +716,7 @@ int aliceVision_main(int argc, char **argv)
                   ++lcpGeometryViewCount;
               }
           }
+          intrinsicInitMode = camera::EIntrinsicInitMode::LCP;
         }
 
         if (lensParam.hasVignetteParams() && !lensParam.vignParams.isEmpty)
