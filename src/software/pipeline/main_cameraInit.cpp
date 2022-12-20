@@ -650,22 +650,28 @@ int aliceVision_main(int argc, char **argv)
       sensorWidth = 36.0;
     }
 
+    float apertureValue = 2.f * std::log(view.getMetadataFNumber()) / std::log(2.0);
+    float focusDistance = 0.f;
+
+    camera::EINTRINSIC lcpCameraModel = camera::EINTRINSIC::UNKNOWN;
+
+    LensParam lensParam;
+    if (lcpData != nullptr)
+    {
+        lcpData->getDistortionParams(focalLengthmm, focusDistance, lensParam);
+        lcpData->getVignettingParams(focalLengthmm, focusDistance, lensParam);
+
+        lcpCameraModel = lensParam.isFisheye() ? camera::EINTRINSIC::PINHOLE_CAMERA_FISHEYE : camera::EINTRINSIC::PINHOLE_CAMERA_RADIAL3;
+    }
+
     // build intrinsic
     std::shared_ptr<camera::IntrinsicBase> intrinsicBase = getViewIntrinsic(
         view, focalLengthmm, sensorWidth, defaultFocalLength, defaultFieldOfView, 
         defaultFocalRatio, defaultOffsetX, defaultOffsetY, 
-        defaultCameraModel, allowedCameraModels);
+        lcpCameraModel, defaultCameraModel, allowedCameraModels);
 
     if (lcpData != nullptr)
     {
-        float apertureValue = 2.f * std::log(view.getMetadataFNumber()) / std::log(2.0);
-        float focalLength = view.getMetadataFocalLength();
-        float focusDistance = 0.f;
-
-        LensParam lensParam;
-        lcpData->getDistortionParams(focalLength, focusDistance, lensParam);
-        lcpData->getVignettingParams(focalLength, focusDistance, lensParam);
-
         std::shared_ptr<camera::IntrinsicsScaleOffsetDisto> intrinsicDisto = std::dynamic_pointer_cast<camera::IntrinsicsScaleOffsetDisto>(intrinsicBase);
         if (intrinsicDisto)
         {
