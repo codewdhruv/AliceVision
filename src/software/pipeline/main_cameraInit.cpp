@@ -167,8 +167,7 @@ int aliceVision_main(int argc, char **argv)
   bool allowSingleView = false;
   bool errorOnMissingColorProfile = true;
   image::ERawColorInterpretation rawColorInterpretation = image::ERawColorInterpretation::LibRawNoWhiteBalancing;
-  bool enableLensCorrectionProfileSearch = true;
-  bool lensCorrectionProfileSearchIgnoreCameraModel = false;
+  bool lensCorrectionProfileSearchIgnoreCameraModel = true;
 
 
   po::options_description requiredParams("Required parameters");
@@ -188,8 +187,6 @@ int aliceVision_main(int argc, char **argv)
       "DNG Color Profiles (DCP) database path.")
     ("lensCorrectionProfileInfo", po::value<std::string>(&lensCorrectionProfileInfo)->default_value(""),
       "Lens Correction Profile filepath or database directory path.")
-    ("enableLensCorrectionProfileSearch", po::value<bool>(&enableLensCorrectionProfileSearch)->default_value(enableLensCorrectionProfileSearch),
-      "Enable automatic search of Lens Correction Profile in the selected database")
     ("lensCorrectionProfileSearchIgnoreCameraModel", po::value<bool>(&lensCorrectionProfileSearchIgnoreCameraModel)->default_value(lensCorrectionProfileSearchIgnoreCameraModel),
       "Automatic LCP Search considers only the camera maker and the lens name")
     ("defaultFocalLength", po::value<double>(&defaultFocalLength)->default_value(defaultFocalLength),
@@ -321,24 +318,6 @@ int aliceVision_main(int argc, char **argv)
       return EXIT_FAILURE;
   }
 
-  std::vector<fs::path> v_lcpFilepath;
-  if (!lensCorrectionProfileInfo.empty() && !fs::is_directory(lensCorrectionProfileInfo) && !fs::is_regular_file(lensCorrectionProfileInfo))
-  {
-      ALICEVISION_LOG_ERROR("The specified lens correction profile is not valid.");
-      return EXIT_FAILURE;
-  }
-  else if (!lensCorrectionProfileInfo.empty() && fs::is_directory(lensCorrectionProfileInfo) && enableLensCorrectionProfileSearch)
-  {
-      std::vector<std::string> v_ext{ ".lcp" };
-      listFiles(lensCorrectionProfileInfo, v_ext, v_lcpFilepath);
-  }
-  else if (!lensCorrectionProfileInfo.empty() && fs::is_regular_file(lensCorrectionProfileInfo) && fs::extension(lensCorrectionProfileInfo) == ".lcp")
-  {
-      v_lcpFilepath.push_back(lensCorrectionProfileInfo);
-  }
-
-  ALICEVISION_LOG_INFO("LCP database contains " << v_lcpFilepath.size() << " profiles.");
-
   camera::EINTRINSIC allowedCameraModels = camera::EINTRINSIC_parseStringToBitmask(allowedCameraModelsStr);
 
   // use current time as seed for random generator for intrinsic Id without metadata
@@ -410,8 +389,10 @@ int aliceVision_main(int argc, char **argv)
   int viewsWithDCPMetadata = 0;
 
   LCPdatabase lcpStore(lensCorrectionProfileInfo, lensCorrectionProfileSearchIgnoreCameraModel);
-
-  ALICEVISION_LOG_INFO("LCP database contains " << lcpStore.size() << " profiles.");
+  if (!lensCorrectionProfileInfo.empty())
+  {
+    ALICEVISION_LOG_INFO(lcpStore.size() << " profile(s) stored in the LCP database.");
+  }
 
   #pragma omp parallel for
   for (int i = 0; i < sfmData.getViews().size(); ++i)
