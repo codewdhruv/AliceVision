@@ -39,6 +39,13 @@ pipeline:
                       git submodule update -i
               - step:
                   type: Run
+                  name: Build
+                  identifier: Build
+                  spec:
+                    shell: Sh
+                    command: make -j$(nproc)
+              - step:
+                  type: Run
                   name: Configure CMake
                   identifier: Configure_CMake
                   spec:
