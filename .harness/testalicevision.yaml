@@ -65,7 +65,7 @@ pipeline:
                       -DEIGEN_INCLUDE_DIR_HINTS:PATH="${DEPS_INSTALL_DIR}" \
                       -DAlembic_DIR:PATH="${DEPS_INSTALL_DIR}/lib/cmake/Alembic"
           sharedPaths:
-            - /build/
+            - /build
         variables:
           - name: DEPS_INSTALL_DIR
             type: String
