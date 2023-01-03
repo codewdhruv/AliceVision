@@ -66,3 +66,21 @@ pipeline:
                       -DAlembic_DIR:PATH="${DEPS_INSTALL_DIR}/lib/cmake/Alembic"
           sharedPaths:
             - /build/
+        variables:
+          - name: DEPS_INSTALL_DIR
+            type: String
+            description: ""
+            value: /opt/AliceVision_install
+          - name: BUILD_TYPE
+            type: String
+            description: ""
+            value: Release
+          - name: CTEST_OUTPUT_ON_FAILURE
+            type: Number
+            description: ""
+            value: 1
+          - name: ALICEVISION_ROOT
+            type: String
+            description: ""
+            value: ${{ github.workspace }}/../AV_install
+  variables: []
