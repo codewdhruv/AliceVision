@@ -14,7 +14,6 @@ pipeline:
     - stage:
         name: Build Linux
         identifier: Build_Linux
-        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -65,3 +64,5 @@ pipeline:
                       -DCeres_DIR:PATH="${DEPS_INSTALL_DIR}/share/Ceres" \
                       -DEIGEN_INCLUDE_DIR_HINTS:PATH="${DEPS_INSTALL_DIR}" \
                       -DAlembic_DIR:PATH="${DEPS_INSTALL_DIR}/lib/cmake/Alembic"
+          sharedPaths:
+            - ./build
