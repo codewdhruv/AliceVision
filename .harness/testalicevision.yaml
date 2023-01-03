@@ -39,13 +39,6 @@ pipeline:
                       git submodule update -i
               - step:
                   type: Run
-                  name: Build
-                  identifier: Build
-                  spec:
-                    shell: Sh
-                    command: make -j$(nproc)
-              - step:
-                  type: Run
                   name: Configure CMake
                   identifier: Configure_CMake
                   spec:
@@ -71,6 +64,13 @@ pipeline:
                       -DCeres_DIR:PATH="${DEPS_INSTALL_DIR}/share/Ceres" \
                       -DEIGEN_INCLUDE_DIR_HINTS:PATH="${DEPS_INSTALL_DIR}" \
                       -DAlembic_DIR:PATH="${DEPS_INSTALL_DIR}/lib/cmake/Alembic"
+              - step:
+                  type: Run
+                  name: Build
+                  identifier: Build
+                  spec:
+                    shell: Sh
+                    command: make -j$(nproc)
           sharedPaths:
             - /build
         variables:
