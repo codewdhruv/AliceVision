@@ -8,7 +8,6 @@ pipeline:
     - stage:
         name: build
         identifier: build
-        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -73,6 +72,8 @@ pipeline:
               spec:
                 connectorRef: account.harnessImage
                 image: alicevision/alicevision-deps:ci-2021-04-22-centos7-cuda10.2
+          sharedPaths:
+            - ./build
         variables:
           - name: DEPS_INSTALL_DIR
             type: String
