@@ -11,12 +11,6 @@ pipeline:
         type: CI
         spec:
           cloneCodebase: true
-          platform:
-            os: Linux
-            arch: Amd64
-          runtime:
-            type: Cloud
-            spec: {}
           execution:
             steps:
               - step:
@@ -24,6 +18,8 @@ pipeline:
                   name: prepare file tree
                   identifier: prepare_file_tree
                   spec:
+                    connectorRef: DhrubajyotiDocker
+                    image: alicevision/alicevision-deps:ci-2021-04-22-centos7-cuda10.2
                     shell: Sh
                     command: |-
                       mkdir ./build
@@ -36,6 +32,8 @@ pipeline:
                   name: Configure CMake
                   identifier: Configure_CMake
                   spec:
+                    connectorRef: DhrubajyotiDocker
+                    image: alicevision/alicevision-deps:ci-2021-04-22-centos7-cuda10.2
                     shell: Sh
                     command: cmake -DCMAKE_BUILD_TYPE= Release
               - step:
@@ -43,6 +41,8 @@ pipeline:
                   name: Build
                   identifier: Build
                   spec:
+                    connectorRef: DhrubajyotiDocker
+                    image: alicevision/alicevision-deps:ci-2021-04-22-centos7-cuda10.2
                     shell: Sh
                     command: make -j$(nproc)
           serviceDependencies:
@@ -54,6 +54,13 @@ pipeline:
                 image: alicevision/alicevision-deps:ci-2021-04-22-centos7-cuda10.2
           sharedPaths:
             - /build
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: k8sdhruba
+              namespace: default
+              nodeSelector: {}
+              os: Linux
         variables:
           - name: DEPS_INSTALL_DIR
             type: String
