@@ -4,16 +4,11 @@ pipeline:
   projectIdentifier: DhrubaCI
   orgIdentifier: default
   tags: {}
-  properties:
-    ci:
-      codebase:
-        connectorRef: dhrubaaccountconnector
-        repoName: AliceVision
-        build: <+input>
   stages:
     - stage:
-        name: Build Linux
-        identifier: Build_Linux
+        name: build
+        identifier: build
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -27,8 +22,8 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: Prepare File Tree
-                  identifier: Prepare_File_Tree
+                  name: prepare file tree
+                  identifier: prepare_file_tree
                   spec:
                     shell: Sh
                     command: |-
@@ -37,57 +32,10 @@ pipeline:
                       mkdir ./functional_tests
                       mkdir ../AV_install
                       git submodule update -i
-              - step:
-                  type: Run
-                  name: Configure CMake
-                  identifier: Configure_CMake
-                  spec:
-                    shell: Sh
-                    command: |-
-                      cmake .. \
-                      -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-                      -DBUILD_SHARED_LIBS:BOOL=ON \
-                      -DCMAKE_PREFIX_PATH="${DEPS_INSTALL_DIR}" \
-                      -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../../AV_install \
-                      -DTARGET_ARCHITECTURE=core \
-                      -DALICEVISION_BUILD_TESTS:BOOL=ON \
-                      -DALICEVISION_BUILD_EXAMPLES:BOOL=ON \
-                      -DALICEVISION_USE_OPENCV:BOOL=ON \
-                      -DALICEVISION_USE_CUDA:BOOL=ON \
-                      -DALICEVISION_USE_CCTAG:BOOL=ON \
-                      -DALICEVISION_USE_POPSIFT:BOOL=ON \
-                      -DALICEVISION_USE_ALEMBIC:BOOL=ON  \
-                      -DOpenCV_DIR:PATH="${DEPS_INSTALL_DIR}/share/OpenCV" \
-                      -DALICEVISION_USE_OPENGV:BOOL=ON \
-                      -DOPENGV_DIR:PATH="${DEPS_INSTALL_DIR}" \
-                      -DBOOST_NO_CXX11:BOOL=ON \
-                      -DCeres_DIR:PATH="${DEPS_INSTALL_DIR}/share/Ceres" \
-                      -DEIGEN_INCLUDE_DIR_HINTS:PATH="${DEPS_INSTALL_DIR}" \
-                      -DAlembic_DIR:PATH="${DEPS_INSTALL_DIR}/lib/cmake/Alembic"
-              - step:
-                  type: Run
-                  name: Build
-                  identifier: Build
-                  spec:
-                    shell: Sh
-                    command: make -j$(nproc)
-          sharedPaths:
-            - /build
-        variables:
-          - name: DEPS_INSTALL_DIR
-            type: String
-            description: ""
-            value: /opt/AliceVision_install
-          - name: BUILD_TYPE
-            type: String
-            description: ""
-            value: Release
-          - name: CTEST_OUTPUT_ON_FAILURE
-            type: Number
-            description: ""
-            value: 1
-          - name: ALICEVISION_ROOT
-            type: String
-            description: ""
-            value: ${{ github.workspace }}/../AV_install
   variables: []
+  properties:
+    ci:
+      codebase:
+        connectorRef: dhrubaaccountconnector
+        repoName: alicevision
+        build: <+input>
