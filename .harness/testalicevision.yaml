@@ -37,9 +37,7 @@ pipeline:
                   identifier: Configure_CMake
                   spec:
                     shell: Sh
-                    command: |-
-                      cmake -DCMAKE_BUILD_TYPE= <+pipeline.variables.BUILD_TYPE>
-                                 
+                    command: cmake -DCMAKE_BUILD_TYPE= Release
               - step:
                   type: Run
                   name: Build
