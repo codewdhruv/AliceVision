@@ -37,27 +37,9 @@ pipeline:
                   identifier: Configure_CMake
                   spec:
                     shell: Sh
-                    command: |2-
-                                cmake \
-                                 -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-                                 -DBUILD_SHARED_LIBS:BOOL=ON \
-                                 -DCMAKE_PREFIX_PATH="${DEPS_INSTALL_DIR}" \
-                                 -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../../AV_install \
-                                 -DTARGET_ARCHITECTURE=core \
-                                 -DALICEVISION_BUILD_TESTS:BOOL=ON \
-                                 -DALICEVISION_BUILD_EXAMPLES:BOOL=ON \
-                                 -DALICEVISION_USE_OPENCV:BOOL=ON \
-                                 -DALICEVISION_USE_CUDA:BOOL=ON \
-                                 -DALICEVISION_USE_CCTAG:BOOL=ON \
-                                 -DALICEVISION_USE_POPSIFT:BOOL=ON \
-                                 -DALICEVISION_USE_ALEMBIC:BOOL=ON  \
-                                 -DOpenCV_DIR:PATH="${DEPS_INSTALL_DIR}/share/OpenCV" \
-                                 -DALICEVISION_USE_OPENGV:BOOL=ON \
-                                 -DOPENGV_DIR:PATH="${DEPS_INSTALL_DIR}" \
-                                 -DBOOST_NO_CXX11:BOOL=ON \
-                                 -DCeres_DIR:PATH="${DEPS_INSTALL_DIR}/share/Ceres" \
-                                 -DEIGEN_INCLUDE_DIR_HINTS:PATH="${DEPS_INSTALL_DIR}" \
-                                 -DAlembic_DIR:PATH="${DEPS_INSTALL_DIR}/lib/cmake/Alembic"
+                    command: |-
+                      cmake -DCMAKE_BUILD_TYPE= <+pipeline.variables.BUILD_TYPE>
+                                 
               - step:
                   type: Run
                   name: Build
