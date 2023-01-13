@@ -38,7 +38,7 @@ pipeline:
                   identifier: cmake
                   spec:
                     shell: Sh
-                    command: "cmake -DCMAKE_BUILD_TYPE=Release "
+                    command: "cmake DCMAKE_BUILD_TYPE=Release "
           platform:
             os: Linux
             arch: Amd64
