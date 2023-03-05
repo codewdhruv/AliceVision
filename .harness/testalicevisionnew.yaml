@@ -14,7 +14,6 @@ pipeline:
     - stage:
         name: build
         identifier: build
-        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -83,3 +82,5 @@ pipeline:
                       DEPS_INSTALL_DIR: /opt/AliceVision_install
                       BUILD_TYPE: Release
                       CTEST_OUTPUT_ON_FAILURE: "1"
+          sharedPaths:
+            - ./build
