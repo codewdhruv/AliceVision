@@ -83,4 +83,4 @@ pipeline:
                       BUILD_TYPE: Release
                       CTEST_OUTPUT_ON_FAILURE: "1"
           sharedPaths:
-            - ./build
+            - /build
