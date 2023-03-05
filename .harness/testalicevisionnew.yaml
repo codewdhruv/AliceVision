@@ -1,0 +1,48 @@
+pipeline:
+  name: test-alicevision
+  identifier: testalicevision
+  projectIdentifier: NgLabs
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: gitconnectordhruba
+        repoName: AliceVision
+        build: <+input>
+  stages:
+    - stage:
+        name: build
+        identifier: build
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Action
+                  name: Checkout
+                  identifier: Checkout
+                  spec:
+                    uses: actions/checkout@v1
+              - step:
+                  type: Run
+                  name: Prepare File Tree
+                  identifier: Prepare_File_Tree
+                  spec:
+                    connectorRef: harnessnew
+                    image: alicevision/alicevision-deps:ci-2021-04-22-centos7-cuda10.2
+                    shell: Sh
+                    command: |2-
+                                mkdir ./build
+                                mkdir ./build_as_3rdparty
+                                mkdir ./functional_tests
+                                mkdir ../AV_install
+                                git submodule update -i
